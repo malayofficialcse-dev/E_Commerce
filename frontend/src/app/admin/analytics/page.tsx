@@ -11,7 +11,7 @@ import {
   MousePointerClick
 } from "lucide-react";
 import { motion } from "framer-motion";
-import axios from "axios";
+import api from "@/lib/api";
 
 import { 
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area,
@@ -57,19 +57,7 @@ const AnalyticsPage = () => {
   useEffect(() => {
     const fetchAnalytics = async () => {
       try {
-        const token = localStorage.getItem("token");
-        if (!token) {
-           setError("No authentication token found. Please login again.");
-           setLoading(false);
-           return;
-        }
-
-        const { data: orderRes } = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/orders`,
-          {
-            headers: { Authorization: `Bearer ${token}` }
-          }
-        );
+        const { data: orderRes } = await api.get("/orders");
         
         const orders = orderRes.orders || [];
         

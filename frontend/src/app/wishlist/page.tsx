@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import axios from "axios";
+import api from "@/lib/api";
 import { ArrowLeft, Trash2, ShoppingCart, Heart } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
@@ -39,9 +39,7 @@ const WishlistPage = () => {
 
   const fetchWishlist = React.useCallback(async (userId: string) => {
     try {
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/users/${userId}/wishlist`
-      );
+      const response = await api.get(`/users/${userId}/wishlist`);
       setWishlist(response.data.wishlist);
     } catch (error: any) {
       console.error("Failed to fetch wishlist:", error);
@@ -70,9 +68,7 @@ const WishlistPage = () => {
   const removeFromWishlist = async (productId: string) => {
     if (!user) return;
     try {
-      await axios.delete(
-        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/users/${user._id}/wishlist/${productId}`
-      );
+      await api.delete(`/users/${user._id}/wishlist/${productId}`);
       setWishlist(prev => prev.filter(item => item._id !== productId));
     } catch (error) {
       console.error("Failed to remove from wishlist:", error);

@@ -19,7 +19,7 @@ import {
   Video
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import axios from "axios";
+import api from "@/lib/api";
 import { useCartStore } from "@/store/useCartStore";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
@@ -81,7 +81,7 @@ const ProductPage = () => {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const { data } = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/products/slug/${slug}`);
+        const { data } = await api.get(`/products/slug/${slug}`);
         setProduct(data);
       } catch (error) {
         console.error("Failed to fetch product", error);
@@ -104,9 +104,7 @@ const ProductPage = () => {
     const checkWishlistStatus = async () => {
       if (!user || !product) return;
       try {
-        const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/users/${user._id}/wishlist`
-        );
+        const response = await api.get(`/users/${user._id}/wishlist`);
         const wishlist = response.data.wishlist || [];
         const exists = wishlist.some((item: any) => item._id === product._id || item === product._id);
         setInWishlist(exists);
@@ -188,15 +186,10 @@ const ProductPage = () => {
     
     try {
       if (inWishlist) {
-         await axios.delete(
-            `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/users/${user._id}/wishlist/${product!._id}`
-         );
+         await api.delete(`/users/${user._id}/wishlist/${product!._id}`);
          setInWishlist(false);
       } else {
-         await axios.post(
-            `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/users/${user._id}/wishlist`,
-            { productId: product!._id }
-         );
+         await api.post(`/users/${user._id}/wishlist`, { productId: product!._id });
          setInWishlist(true);
       }
     } catch (error) {

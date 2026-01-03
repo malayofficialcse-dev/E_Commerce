@@ -13,7 +13,7 @@ import {
   ArrowLeft
 } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
-import axios from "axios";
+import api from "@/lib/api";
 import Image from "next/image";
 // Removed date-fns import
 
@@ -43,7 +43,7 @@ const OrdersPage = () => {
       const parsedUser = JSON.parse(storedUser);
 
       try {
-        const { data } = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/orders/user/${parsedUser._id}`);
+        const { data } = await api.get(`/orders/user/${parsedUser._id}`);
         setOrders(data.orders);
       } catch (error) {
         console.error("Fetch orders error", error);
