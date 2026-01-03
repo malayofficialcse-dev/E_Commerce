@@ -27,13 +27,7 @@ import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 import Magnetic from "@/components/ui/Magnetic";
 
-declare global {
-  namespace JSX {
-    interface IntrinsicElements {
-      'model-viewer': any;
-    }
-  }
-}
+
 
 interface Product {
   _id: string;
