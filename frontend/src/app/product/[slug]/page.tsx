@@ -322,6 +322,7 @@ const ProductPage = () => {
                         className="w-full h-full relative"
                      >
                        {activeImageIndex === -1 && product.modelUrl ? (
+                          // @ts-ignore
                           <model-viewer
                              src={product.modelUrl}
                              alt="3D Model"
