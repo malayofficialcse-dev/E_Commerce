@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import api from "@/lib/api";
 import { 
   Search,
   Navigation,
@@ -49,11 +49,7 @@ const AdminOrdersPage = () => {
 
   const fetchOrders = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/orders`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const { data } = await api.get("/orders");
       setOrders(data.orders);
     } catch (error) {
       console.error("Fetch orders failed", error);
@@ -76,20 +72,15 @@ const AdminOrdersPage = () => {
   const handleUpdateSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const token = localStorage.getItem("token");
-      await axios.patch(
-        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/orders/${updatingOrderId}/status`,
-        {
-          orderStatus: updateForm.orderStatus,
-          currentLocation: {
-            address: updateForm.address,
-            lat: updateForm.lat,
-            lng: updateForm.lng
-          },
-          description: updateForm.description
+      await api.patch(`/orders/${updatingOrderId}/status`, {
+        orderStatus: updateForm.orderStatus,
+        currentLocation: {
+          address: updateForm.address,
+          lat: updateForm.lat,
+          lng: updateForm.lng
         },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+        description: updateForm.description
+      });
       
       setUpdatingOrderId(null);
       fetchOrders();

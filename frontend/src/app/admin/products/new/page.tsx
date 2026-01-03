@@ -1,8 +1,9 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
-import axios from "axios";
+import api from "@/lib/api";
 import { 
   ArrowLeft, 
   Upload, 
@@ -61,7 +62,7 @@ const NewProductPage = () => {
 
   const fetchCategories = async () => {
     try {
-      const { data } = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/categories`);
+      const { data } = await api.get("/categories");
       setCategories(data);
     } catch (error) {
       console.error("Failed to fetch categories", error);
@@ -70,7 +71,7 @@ const NewProductPage = () => {
 
   const fetchSubCategories = async (parentId: string) => {
     try {
-      const { data } = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/categories/${parentId}/sub`);
+      const { data } = await api.get(`/categories/${parentId}/sub`);
       setSubCategories(data);
     } catch (error) {
       console.error("Failed to fetch subcategories", error);
@@ -103,8 +104,8 @@ const NewProductPage = () => {
     });
 
     try {
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/upload`,
+      const response = await api.post(
+        "/upload",
         data,
         {
           headers: { "Content-Type": "multipart/form-data" }
@@ -194,24 +195,7 @@ const NewProductPage = () => {
         }))
       };
 
-      const token = localStorage.getItem("token");
-      if (!token) {
-        alert("You must be logged in as admin");
-        return;
-      }
-
-      const config = {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      };
-
-      await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/products`,
-        payload,
-        config
-      );
+      await api.post("/products", payload);
 
       router.push("/admin/products");
     } catch (error: any) {
@@ -486,7 +470,7 @@ const NewProductPage = () => {
                               <div className="flex gap-2 overflow-x-auto pb-2 custom-scrollbar">
                                  {variant.images && variant.images.map((img, i) => (
                                     <div key={i} className="relative w-16 h-16 flex-shrink-0 rounded-lg overflow-hidden border border-border group/img">
-                                       <img src={img} alt="" className="w-full h-full object-cover" />
+                                       <Image src={img} alt="" fill className="object-cover" sizes="64px" />
                                        <button 
                                           type="button"
                                           onClick={() => removeImage(i, true, idx)}
@@ -594,7 +578,7 @@ const NewProductPage = () => {
 
                     {formData.images.map((url, idx) => (
                        <div key={idx} className="relative aspect-square rounded-2xl overflow-hidden border border-border group">
-                          <img src={url} alt="Preview" className="w-full h-full object-cover" />
+                          <Image src={url} alt="Preview" fill className="object-cover" sizes="150px" />
                           <button 
                              type="button"
                              onClick={() => removeImage(idx)}

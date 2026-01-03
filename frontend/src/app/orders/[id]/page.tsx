@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
-import axios from "axios";
+import api from "@/lib/api";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
@@ -70,7 +70,7 @@ const OrderTrackingPage = () => {
   useEffect(() => {
     const fetchOrder = async () => {
       try {
-        const { data } = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/orders/${id}`);
+        const { data } = await api.get(`/orders/${id}`);
         setOrder(data.order);
         
         // Dynamic Distance Calculation

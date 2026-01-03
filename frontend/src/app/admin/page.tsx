@@ -12,7 +12,7 @@ import {
   Clock
 } from "lucide-react";
 import { motion } from "framer-motion";
-import axios from "axios";
+import api from "@/lib/api";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 
@@ -53,19 +53,7 @@ const AdminDashboard = () => {
 
   const fetchDashboardData = async () => {
     try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        setError("Please login to view dashboard.");
-        setLoading(false);
-        return;
-      }
-
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/orders`,
-        {
-          headers: { Authorization: `Bearer ${token}` }
-        }
-      );
+      const response = await api.get("/orders");
       const allOrders = response.data.orders || [];
 
       // Calculate Stats

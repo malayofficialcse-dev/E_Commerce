@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
@@ -20,7 +21,7 @@ import {
 import Navbar from "@/components/layout/Navbar";
 import { useCartStore } from "@/store/useCartStore";
 import { cn } from "@/lib/utils";
-import axios from "axios";
+import api from "@/lib/api";
 
 const STEPS = [
   { id: "shipping", title: "Information", icon: MapPin },
@@ -144,10 +145,7 @@ const CheckoutPage = () => {
         paymentProvider: formData.paymentProvider
       };
 
-      const { data } = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/orders`,
-        orderData
-      );
+      const { data } = await api.post("/orders", orderData);
 
       clearCart();
       router.push(`/orders/${data.order._id}`);
@@ -481,7 +479,7 @@ const CheckoutPage = () => {
                   {items.map((item, idx) => (
                     <div key={idx} className="flex gap-4 group">
                       <div className="w-16 h-20 bg-muted rounded-xl overflow-hidden flex-shrink-0 relative">
-                        <img src={item.image} alt="" className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" />
+                        <Image src={item.image} alt={item.name} fill className="object-cover grayscale group-hover:grayscale-0 transition-all duration-500" sizes="64px" />
                       </div>
                       <div className="flex-1 flex flex-col justify-center">
                         <h4 className="text-xs font-bold truncate">{item.name}</h4>

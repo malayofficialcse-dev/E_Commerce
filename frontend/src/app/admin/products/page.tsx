@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import axios from "axios";
+import api from "@/lib/api";
 import { Plus, Search, Trash2, MoreVertical, Package } from "lucide-react";
 import Image from "next/image";
 
@@ -31,10 +31,8 @@ const AdminProductsPage = () => {
 
   const fetchProducts = async () => {
     try {
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/products?limit=100`
-      );
-      setProducts(response.data.products || []);
+      const { data } = await api.get("/products?limit=100");
+      setProducts(data.products || []);
     } catch (error) {
       console.error("Failed to fetch products:", error);
     } finally {
@@ -45,11 +43,7 @@ const AdminProductsPage = () => {
   const handleDelete = async (id: string) => {
     if (!window.confirm("Are you sure you want to delete this product?")) return;
     try {
-        const token = localStorage.getItem("token");
-        await axios.delete(
-            `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/products/${id}`,
-            { headers: { Authorization: `Bearer ${token}` } }
-        );
+        await api.delete(`/products/${id}`);
         setProducts(prev => prev.filter(p => p._id !== id));
     } catch (error) {
         console.error("Failed to delete product:", error);
