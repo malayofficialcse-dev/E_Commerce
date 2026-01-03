@@ -239,7 +239,7 @@ export const initiateReturn = async (req: Request, res: Response): Promise<void>
     order.returnData = {
       status: "requested",
       reason,
-      requestDate: new Date(),
+      requestedAt: new Date(),
     };
 
     // Keep orderStatus as delivered but add return request flag or change status
