@@ -26,7 +26,8 @@ import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 import Magnetic from "@/components/ui/Magnetic";
 
-const ModelViewer = "model-viewer" as any;
+// Forced update to trigger fresh build on Render - unique id: 1736630000
+const VModelViewer = "model-viewer" as any;
 
 interface Product {
   _id: string;
@@ -321,7 +322,7 @@ const ProductPage = () => {
                         className="w-full h-full relative"
                      >
                        {activeImageIndex === -1 && product.modelUrl ? (
-                           <ModelViewer
+                           <VModelViewer
                               src={product.modelUrl}
                               alt="3D Model"
                               ar
