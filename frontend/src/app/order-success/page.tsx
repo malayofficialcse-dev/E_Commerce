@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -9,7 +9,7 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import confetti from "canvas-confetti";
 
-const OrderSuccessPage = () => {
+const OrderSuccessContent = () => {
   const searchParams = useSearchParams();
   const orderId = searchParams.get("orderId");
 
@@ -165,6 +165,18 @@ const OrderSuccessPage = () => {
 
       <Footer />
     </div>
+  );
+};
+
+const OrderSuccessPage = () => {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-[#050505] flex items-center justify-center">
+        <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    }>
+      <OrderSuccessContent />
+    </Suspense>
   );
 };
 

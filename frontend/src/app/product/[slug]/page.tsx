@@ -12,7 +12,6 @@ import {
   Share2, 
   ChevronRight,
   ChevronLeft,
-  ShieldCheck,
   Truck,
   RotateCcw,
   ChevronDown,
@@ -27,7 +26,7 @@ import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 import Magnetic from "@/components/ui/Magnetic";
 
-
+const ModelViewer = "model-viewer" as any;
 
 interface Product {
   _id: string;
@@ -100,9 +99,9 @@ const ProductPage = () => {
       try {
         const response = await api.get(`/users/${user._id}/wishlist`);
         const wishlist = response.data.wishlist || [];
-        const exists = wishlist.some((item: any) => item._id === product._id || item === product._id);
+        const exists = wishlist.some((item: { _id: string }) => item._id === product._id || (item as unknown as string) === product._id);
         setInWishlist(exists);
-      } catch (error: any) {
+      } catch (error: unknown) {
         console.error("Failed to check wishlist:", error);
       }
     };
@@ -216,7 +215,7 @@ const ProductPage = () => {
       color: selectedColor,
       size: selectedSize,
       quantity: quantity,
-      variantId: currentVariant ? (currentVariant as any)._id : "default" 
+      variantId: currentVariant ? (currentVariant as unknown as { _id: string })._id : "default" 
     });
     
     alert("Added to cart");
@@ -322,17 +321,16 @@ const ProductPage = () => {
                         className="w-full h-full relative"
                      >
                        {activeImageIndex === -1 && product.modelUrl ? (
-                          // @ts-ignore
-                          <model-viewer
-                             src={product.modelUrl}
-                             alt="3D Model"
-                             ar
-                             ar-modes="webxr scene-viewer quick-look"
-                             camera-controls
-                             shadow-intensity="1"
-                             auto-rotate
-                             className="w-full h-full"
-                          ></model-viewer>
+                           <ModelViewer
+                              src={product.modelUrl}
+                              alt="3D Model"
+                              ar
+                              ar-modes="webxr scene-viewer quick-look"
+                              camera-controls
+                              shadow-intensity="1"
+                              auto-rotate
+                              className="w-full h-full"
+                           />
                        ) : galleryItems[activeImageIndex] ? (
                           galleryItems[activeImageIndex].type === "video" ? (
                              <video 

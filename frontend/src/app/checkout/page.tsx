@@ -15,7 +15,6 @@ import {
   ShoppingBag,
   Info,
   Lock,
-  Plus,
   Navigation
 } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
@@ -34,7 +33,7 @@ const CheckoutPage = () => {
   const { items, totalPrice, clearCart } = useCartStore();
   const [currentStep, setCurrentStep] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<{ _id: string; email?: string; firstName?: string; lastName?: string } | null>(null);
 
   const [formData, setFormData] = useState({
     email: "",
@@ -65,7 +64,7 @@ const CheckoutPage = () => {
         router.push("/login?redirect=checkout");
       }
     }
-  }, []);
+  }, [router]);
 
   const fillDemoData = () => {
     setFormData(prev => ({
@@ -85,7 +84,7 @@ const CheckoutPage = () => {
             <ShoppingBag size={40} className="text-muted-foreground/30" />
          </div>
          <h1 className="text-3xl font-black mb-4">Your bag is empty</h1>
-         <p className="text-muted-foreground mb-8 max-w-xs mx-auto">Looks like you haven't added anything to your cart yet.</p>
+         <p className="text-muted-foreground mb-8 max-w-xs mx-auto">Looks like you haven&apos;t added anything to your cart yet.</p>
          <button 
            onClick={() => router.push("/shop")}
            className="px-8 h-14 bg-primary text-white font-black rounded-2xl hover:scale-105 transition-all shadow-xl shadow-primary/20"
@@ -113,6 +112,12 @@ const CheckoutPage = () => {
   };
 
   const handlePlaceOrder = async () => {
+    if (!user) {
+      alert("Please login to place an order.");
+      router.push("/login?redirect=checkout");
+      return;
+    }
+
     if (!formData.street || !formData.city || !formData.state || !formData.zipCode || !formData.phone) {
       alert("Please fill in all shipping details.");
       setCurrentStep(0);
@@ -121,8 +126,9 @@ const CheckoutPage = () => {
 
     setLoading(true);
     try {
+      const currentUser = user!; // user is guaranteed to be non-null here due to the check above
       const orderData = {
-        userId: user._id,
+        userId: currentUser._id,
         items: items.map(item => ({
           product: item.id,
           variantId: item.variantId || "default",
@@ -149,9 +155,16 @@ const CheckoutPage = () => {
 
       clearCart();
       router.push(`/orders/${data.order._id}`);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Order error", error);
-      alert(error.response?.data?.message || "Failed to place order. Please check all fields.");
+      let message = "Failed to place order. Please check all fields.";
+      
+      if (error && typeof error === 'object' && 'response' in error) {
+        const axiosError = error as { response: { data: { message: string } } };
+        message = axiosError.response?.data?.message || message;
+      }
+      
+      alert(message);
     } finally {
       setLoading(false);
     }
@@ -393,7 +406,7 @@ const CheckoutPage = () => {
                      ].map((method) => (
                         <div 
                            key={method.id}
-                           onClick={() => setFormData({...formData, paymentProvider: method.id as any})}
+                           onClick={() => setFormData({...formData, paymentProvider: method.id})}
                            className={cn(
                              "p-6 rounded-3xl border-2 transition-all cursor-pointer flex items-center gap-4",
                              formData.paymentProvider === method.id ? "border-primary bg-primary/5 shadow-lg shadow-primary/5" : "border-border hover:border-muted-foreground/30"
