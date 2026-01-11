@@ -113,8 +113,8 @@ const seed = async () => {
         for (const sub of subCategories) {
             const price = sub.slug.includes("mobiles") ? 999 : 299;
             const img = sub.slug.includes("mobiles") 
-                ? "https://images.unsplash.com/photo-1696446701796-da61225697cc?w=800"
-                : "https://images.unsplash.com/photo-1520975916090-31d041a783b2?w=800";
+                ? "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=800&q=80"
+                : "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=800&q=80";
             
             for (let i = 0; i < 10; i++) {
                 const title = `${sub.name} Pro Max ${i + 1}`;

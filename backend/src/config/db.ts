@@ -4,6 +4,7 @@ const connectDB = async () => {
   try {
     const conn = await mongoose.connect(process.env.ATLAS_URL  || "mongodb://localhost:27017/ecommerce");
     console.log(`MongoDB Connected: ${conn.connection.host}`);
+    console.log(`Database Name: ${conn.connection.name}`);
   } catch (error: any) {
     console.error(`Error: ${error.message}`);
     process.exit(1);

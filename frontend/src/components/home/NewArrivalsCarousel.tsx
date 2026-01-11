@@ -12,6 +12,24 @@ const NewArrivalsCarousel = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
+  const [isPaused, setIsPaused] = useState(false);
+  
+  useEffect(() => {
+    if (isPaused || isLoading) return;
+    
+    const interval = setInterval(() => {
+      if (scrollRef.current) {
+        const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
+        if (scrollLeft >= scrollWidth - clientWidth - 5) {
+          scrollRef.current.scrollTo({ left: 0, behavior: "smooth" });
+        } else {
+          scrollRef.current.scrollBy({ left: 350 + 32, behavior: "smooth" });
+        }
+      }
+    }, 3000);
+    
+    return () => clearInterval(interval);
+  }, [data, isPaused, isLoading]);
 
   const checkScroll = () => {
     if (scrollRef.current) {
@@ -32,8 +50,7 @@ const NewArrivalsCarousel = () => {
 
   const scroll = (direction: "left" | "right") => {
     if (scrollRef.current) {
-      const { clientWidth } = scrollRef.current;
-      const scrollAmount = direction === "left" ? -clientWidth / 1.5 : clientWidth / 1.5;
+      const scrollAmount = direction === "left" ? -350 - 32 : 350 + 32;
       scrollRef.current.scrollBy({ left: scrollAmount, behavior: "smooth" });
     }
   };
@@ -71,6 +88,8 @@ const NewArrivalsCarousel = () => {
 
       <div 
         ref={scrollRef}
+        onMouseEnter={() => setIsPaused(true)}
+        onMouseLeave={() => setIsPaused(false)}
         className="flex gap-8 overflow-x-auto px-[max(1.5rem,calc((100vw-80rem)/2))] no-scrollbar scroll-smooth pb-12"
         style={{ scrollSnapType: "x mandatory" }}
       >

@@ -157,6 +157,4 @@
   scrollbar-width: none;
 }
 
-*, *::before, *::after {
-  cursor: none !important;
-}
+

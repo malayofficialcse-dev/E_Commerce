@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
@@ -11,7 +11,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Search, ChevronDown, SlidersHorizontal } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const ShopPage = () => {
+const ShopContent = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
   
@@ -48,7 +48,7 @@ const ShopPage = () => {
     if (page > 1) params.set("page", page.toString());
 
     const newPath = `/shop?${params.toString()}`;
-    if (window.location.search !== `?${params.toString()}`) {
+    if (typeof window !== 'undefined' && window.location.search !== `?${params.toString()}`) {
        router.replace(newPath);
     }
   }, [searchQuery, selectedCategories, selectedSubCategories, priceRange, sort, page, router]);
@@ -233,6 +233,19 @@ const ShopPage = () => {
       </main>
       <Footer />
     </div>
+  );
+};
+
+const ShopPage = () => {
+  return (
+    <Suspense fallback={
+       <div className="min-h-screen bg-background flex flex-col items-center justify-center">
+          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4" />
+          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground">Curating Collection...</p>
+       </div>
+    }>
+      <ShopContent />
+    </Suspense>
   );
 };
 

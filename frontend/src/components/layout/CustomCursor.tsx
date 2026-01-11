@@ -40,25 +40,25 @@ const CustomCursor = () => {
     default: {
       width: 12,
       height: 12,
-      backgroundColor: "var(--primary)",
+      backgroundColor: "var(--color-primary)",
       mixBlendMode: "normal" as const,
     },
     view: {
       width: 80,
       height: 80,
-      backgroundColor: "var(--foreground)",
+      backgroundColor: "var(--color-foreground)",
       mixBlendMode: "difference" as const,
     },
     buy: {
       width: 100,
       height: 100,
-      backgroundColor: "var(--primary)",
+      backgroundColor: "var(--color-primary)",
       mixBlendMode: "normal" as const,
     },
     pointer: {
       width: 40,
       height: 40,
-      backgroundColor: "var(--foreground)",
+      backgroundColor: "var(--color-foreground)",
       mixBlendMode: "difference" as const,
     }
   };

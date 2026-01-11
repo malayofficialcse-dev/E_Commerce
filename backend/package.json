@@ -8,6 +8,8 @@
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "seed": "ts-node src/utils/seedData.ts",
     "master-seed": "ts-node src/masterSeed.ts",
+    "seed-products": "ts-node src/seedProducts.ts",
+    "clear-products": "ts-node src/clearProducts.ts",
     "build": "tsc"
   },
   "keywords": [],

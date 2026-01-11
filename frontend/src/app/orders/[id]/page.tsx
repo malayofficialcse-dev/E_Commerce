@@ -7,14 +7,12 @@ import {
   Package, 
   Truck, 
   CheckCircle2, 
-  Clock, 
   MapPin, 
   ShoppingBag,
   Bell,
   Navigation,
   ShieldCheck,
-  RotateCcw,
-  Receipt
+  RotateCcw
 } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
@@ -92,6 +90,16 @@ const OrderTrackingPage = () => {
     if (id) fetchOrder();
   }, [id]);
 
+  const steps = [
+    { id: "placed", title: "Expedition Started", desc: "VelvetLuxe Registry Confirmed", icon: CheckCircle2 },
+    { id: "packed", title: "Curation Complete", desc: "Inspected by Master Artisans", icon: Package },
+    { id: "shipped", title: "In Transit", desc: "Via Priority Express", icon: Truck },
+    { id: "out-for-delivery", title: "Incoming", desc: "Arriving at Destination", icon: Navigation },
+    { id: "delivered", title: "Handed Over", desc: "Process Finalized", icon: ShieldCheck },
+  ];
+
+  const currentStepIndex = steps.findIndex(s => s.id === (order?.orderStatus || "placed"));
+
   if (loading) return (
      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.03]" />
@@ -110,80 +118,101 @@ const OrderTrackingPage = () => {
      </div>
   );
 
-  const steps = [
-    { id: "placed", title: "Expedition Started", desc: "VelvetLuxe Registry Confirmed", icon: CheckCircle2 },
-    { id: "packed", title: "Curation Complete", desc: "Inspected by Master Artisans", icon: Package },
-    { id: "shipped", title: "In Transit", desc: "Via Priority Express", icon: Truck },
-    { id: "out-for-delivery", title: "Incoming", desc: "Arriving at Destination", icon: Navigation },
-    { id: "delivered", title: "Handed Over", desc: "Process Finalized", icon: ShieldCheck },
-  ];
-
-  const currentStepIndex = steps.findIndex(s => s.id === order.orderStatus);
 
   return (
     <div className="min-h-screen bg-background selection:bg-primary/30">
       <Navbar />
-      
-      <main className="container mx-auto px-6 pt-32 pb-24 max-w-7xl">
+      <main className="container mx-auto px-6 pt-48 pb-24 max-w-7xl">
          <div className="flex flex-col lg:flex-row gap-12">
             
             {/* Left Column: Map & Primary Tracking */}
             <div className="flex-1 space-y-8">
-               {/* Map View */}
-               <div className="relative h-[520px] bg-[#080808] rounded-[60px] overflow-hidden border border-white/5 shadow-2xl group">
-                   {/* Dark Grid Background */}
-                   <div className="absolute inset-0 opacity-40" style={{ backgroundImage: 'radial-gradient(#333 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
-                   
-                   {/* Custom Map UI */}
-                   <svg className="absolute inset-0 w-full h-full opacity-20 pointer-events-none">
-                      <path 
-                        d="M 100,450 C 200,350 400,150 700,100" 
-                        fill="none" 
-                        stroke="var(--primary)" 
-                        strokeWidth="1" 
-                        strokeDasharray="8,8"
-                      />
-                   </svg>
+                {/* Professional Status Tracker */}
+                <div className="bg-white/[0.03] border border-white/5 rounded-[60px] p-12 lg:p-16 shadow-2xl relative overflow-hidden">
+                   {/* Background Accents */}
+                   <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-bl-[200px] pointer-events-none" />
+                   <div className="absolute bottom-0 left-0 w-48 h-48 bg-primary/5 rounded-tr-[150px] pointer-events-none" />
 
-                   {/* Current Position */}
-                   <motion.div 
-                     initial={{ scale: 0 }}
-                     animate={{ scale: 1 }}
-                     className="absolute z-10"
-                     style={{ 
-                        left: `${Math.min(10 + (currentStepIndex * 20), 85)}%`, 
-                        top: `${Math.max(80 - (currentStepIndex * 15), 15)}%` 
-                     }}
-                   >
-                      <div className="w-32 h-32 bg-primary/20 rounded-full animate-ping opacity-40" />
-                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-6 h-6 bg-primary rounded-full ring-8 ring-background/50 shadow-2xl shadow-primary/50" />
-                      <div className="absolute top-[-80px] left-1/2 -translate-x-1/2 p-4 bg-white/10 backdrop-blur-3xl rounded-2xl border border-white/10 shadow-2xl whitespace-nowrap">
-                         <p className="text-[10px] font-black uppercase text-primary mb-1">Current Sector</p>
-                         <p className="text-xs font-bold text-white uppercase">{order.currentLocation?.address || order.orderStatus}</p>
+                   <div className="relative space-y-16">
+                      <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
+                         <div>
+                            <p className="text-[10px] font-black uppercase tracking-[0.4em] text-primary mb-2">Live Progress</p>
+                            <h2 className="text-4xl font-black italic uppercase tracking-tighter">Current Status: <span className="text-primary">{order.orderStatus.replace("-", " ")}</span></h2>
+                         </div>
+                         <div className="px-6 py-4 bg-white/5 backdrop-blur-3xl rounded-[32px] border border-white/10">
+                            <p className="text-[10px] font-black uppercase opacity-40 mb-1">Estimated Arrival</p>
+                            <p className="text-xl font-black italic text-white">{new Date(order.estimatedDelivery).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}</p>
+                         </div>
                       </div>
-                   </motion.div>
 
-                   {/* Stats Overlay */}
-                   <div className="absolute bottom-8 left-8 right-8 grid grid-cols-2 md:grid-cols-4 gap-4">
-                      {[
-                        { label: "Proximity", value: `${distance} KM`, icon: Navigation, type: "primary" },
-                        { label: "Arrival", value: new Date(order.estimatedDelivery).toLocaleDateString("en-US", { month: "short", day: "numeric" }), icon: Clock },
-                        { label: "Registry", value: `ORD-${order._id.slice(-6).toUpperCase()}`, icon: Receipt },
-                        { label: "Value", value: `$${order.totalAmount.toFixed(2)}`, icon: ShoppingBag }
-                      ].map((stat, i) => (
-                        <div key={i} className={cn(
-                          "p-6 rounded-[32px] backdrop-blur-3xl border flex flex-col gap-2 transition-transform hover:scale-[1.02]",
-                          stat.type === "primary" ? "bg-primary border-primary text-white shadow-xl shadow-primary/40" : "bg-white/5 border-white/10 text-white"
-                        )}>
-                           <stat.icon size={16} className={stat.type === "primary" ? "text-white" : "text-primary"} />
-                           <div>
-                              <p className="text-[8px] font-black uppercase tracking-[0.2em] opacity-40">{stat.label}</p>
-                              <p className="text-lg font-black italic tracking-tighter">{stat.value}</p>
+                      {/* Progressive Stepper */}
+                      <div className="relative pt-12 pb-8">
+                         <div className="absolute top-[60px] left-0 right-0 h-1 bg-white/10 rounded-full overflow-hidden">
+                            <motion.div 
+                               initial={{ width: 0 }}
+                               animate={{ width: `${(currentStepIndex / (steps.length - 1)) * 100}%` }}
+                               transition={{ duration: 2, ease: "circOut" }}
+                               className="h-full bg-primary shadow-[0_0_20px_var(--primary)]"
+                            />
+                         </div>
+
+                         <div className="relative flex justify-between">
+                            {steps.map((step, i) => {
+                               const Icon = step.icon;
+                               const isCompleted = i < currentStepIndex;
+                               const isCurrent = i === currentStepIndex;
+                               
+                               return (
+                                 <div key={step.id} className="flex flex-col items-center gap-6 group">
+                                    <motion.div 
+                                      initial={{ scale: 0.8 }}
+                                      animate={{ scale: isCurrent ? 1.2 : 1 }}
+                                      className={cn(
+                                        "w-14 h-14 rounded-[22px] flex items-center justify-center border-2 transition-all duration-500 z-10",
+                                        isCompleted || isCurrent ? "bg-primary border-primary text-white shadow-xl shadow-primary/30" : "bg-muted border-white/5 text-muted-foreground/30"
+                                      )}
+                                    >
+                                       <Icon size={24} />
+                                       {isCurrent && (
+                                         <motion.div 
+                                            animate={{ scale: [1, 1.4, 1], opacity: [0.5, 0, 0.5] }}
+                                            transition={{ duration: 2, repeat: Infinity }}
+                                            className="absolute inset-0 bg-primary rounded-[22px]"
+                                         />
+                                       )}
+                                    </motion.div>
+                                    <div className="text-center w-24 md:w-32">
+                                       <p className={cn(
+                                         "text-[10px] font-black uppercase tracking-widest mb-1 transition-colors",
+                                         isCompleted || isCurrent ? "text-primary" : "text-muted-foreground/30"
+                                       )}>{step.title}</p>
+                                       <p className="text-[9px] font-medium opacity-40 leading-tight hidden md:block">{step.desc}</p>
+                                    </div>
+                                 </div>
+                               );
+                            })}
+                         </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-8 border-t border-white/5">
+                         {[
+                           { label: "Transit Distance", value: `${distance} KM`, icon: Navigation },
+                           { label: "Security Token", value: `SHP-${order._id.slice(-8).toUpperCase()}`, icon: ShieldCheck },
+                           { label: "Total Valuation", value: `$${order.totalAmount.toFixed(2)}`, icon: ShoppingBag }
+                         ].map((stat, i) => (
+                           <div key={i} className="flex items-center gap-4 p-6 bg-white/[0.02] rounded-[32px] border border-white/5 hover:bg-white/[0.04] transition-colors">
+                              <div className="w-12 h-12 bg-primary/10 text-primary rounded-2xl flex items-center justify-center">
+                                 <stat.icon size={20} />
+                              </div>
+                              <div>
+                                 <p className="text-[8px] font-black uppercase tracking-[0.2em] opacity-30">{stat.label}</p>
+                                 <p className="text-lg font-black italic tracking-tighter text-white">{stat.value}</p>
+                              </div>
                            </div>
-                        </div>
-                      ))}
+                         ))}
+                      </div>
                    </div>
-               </div>
+                </div>
 
                {/* Timeline / Flight Log */}
                <div className="bg-white/[0.02] border border-border p-10 lg:p-14 rounded-[60px] shadow-sm">

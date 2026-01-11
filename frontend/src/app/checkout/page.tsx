@@ -15,7 +15,6 @@ import {
   ShoppingBag,
   Info,
   Lock,
-  Plus,
   Navigation
 } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
@@ -34,7 +33,7 @@ const CheckoutPage = () => {
   const { items, totalPrice, clearCart } = useCartStore();
   const [currentStep, setCurrentStep] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<{ _id: string; email?: string; firstName?: string; lastName?: string } | null>(null);
 
   const [formData, setFormData] = useState({
     email: "",
@@ -65,7 +64,7 @@ const CheckoutPage = () => {
         router.push("/login?redirect=checkout");
       }
     }
-  }, []);
+  }, [router]);
 
   const fillDemoData = () => {
     setFormData(prev => ({
@@ -85,7 +84,7 @@ const CheckoutPage = () => {
             <ShoppingBag size={40} className="text-muted-foreground/30" />
          </div>
          <h1 className="text-3xl font-black mb-4">Your bag is empty</h1>
-         <p className="text-muted-foreground mb-8 max-w-xs mx-auto">Looks like you haven't added anything to your cart yet.</p>
+         <p className="text-muted-foreground mb-8 max-w-xs mx-auto">Looks like you haven&apos;t added anything to your cart yet.</p>
          <button 
            onClick={() => router.push("/shop")}
            className="px-8 h-14 bg-primary text-white font-black rounded-2xl hover:scale-105 transition-all shadow-xl shadow-primary/20"
@@ -113,6 +112,12 @@ const CheckoutPage = () => {
   };
 
   const handlePlaceOrder = async () => {
+    if (!user) {
+      alert("Please login to place an order.");
+      router.push("/login?redirect=checkout");
+      return;
+    }
+
     if (!formData.street || !formData.city || !formData.state || !formData.zipCode || !formData.phone) {
       alert("Please fill in all shipping details.");
       setCurrentStep(0);
@@ -121,8 +126,9 @@ const CheckoutPage = () => {
 
     setLoading(true);
     try {
+      const currentUser = user!; // user is guaranteed to be non-null here due to the check above
       const orderData = {
-        userId: user._id,
+        userId: currentUser._id,
         items: items.map(item => ({
           product: item.id,
           variantId: item.variantId || "default",
@@ -149,9 +155,16 @@ const CheckoutPage = () => {
 
       clearCart();
       router.push(`/orders/${data.order._id}`);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Order error", error);
-      alert(error.response?.data?.message || "Failed to place order. Please check all fields.");
+      let message = "Failed to place order. Please check all fields.";
+      
+      if (error && typeof error === 'object' && 'response' in error) {
+        const axiosError = error as { response: { data: { message: string } } };
+        message = axiosError.response?.data?.message || message;
+      }
+      
+      alert(message);
     } finally {
       setLoading(false);
     }
@@ -166,7 +179,7 @@ const CheckoutPage = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
       
-      <main className="container mx-auto px-6 pt-32 pb-24 max-w-7xl">
+      <main className="container mx-auto px-6 pt-48 pb-24 max-w-7xl">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
           
           {/* Left: Steps & Forms */}
@@ -293,17 +306,28 @@ const CheckoutPage = () => {
                      </div>
                   </div>
 
-                  {/* Mock Map Panel */}
-                  <div className="relative h-64 bg-muted rounded-3xl overflow-hidden border border-border group">
-                      {/* Placeholder for map visual */}
-                      <div className="absolute inset-0 bg-[#000] opacity-10 dark:opacity-20" style={{ backgroundImage: 'radial-gradient(#ffffff 1px, transparent 1px)', backgroundSize: '20px 20px' }} />
+                  {/* Map Panel */}
+                  <div className="relative h-64 bg-[#050505] rounded-3xl overflow-hidden border border-border group transition-all duration-700">
+                      <Image 
+                        src="https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?q=80&w=1000" 
+                        alt="Location Map" 
+                        fill 
+                        className="object-cover opacity-20 grayscale group-hover:scale-110 transition-transform duration-1000"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
+                      
                       <div className="absolute inset-0 flex items-center justify-center">
                          <div className="relative">
-                            <div className="w-12 h-12 bg-primary rounded-full animate-ping opacity-20" />
-                            <MapPin className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-primary" size={32} />
+                            <motion.div 
+                              animate={{ scale: [1, 2, 1], opacity: [0.3, 0.1, 0.3] }}
+                              transition={{ duration: 2, repeat: Infinity }}
+                              className="w-16 h-16 bg-primary rounded-full" 
+                            />
+                            <MapPin className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-primary shadow-[0_0_20px_var(--primary)]" size={32} />
                          </div>
                       </div>
-                      <div className="absolute bottom-6 left-6 right-6 p-4 bg-white/10 dark:bg-black/40 backdrop-blur-xl border border-white/20 rounded-2xl flex items-center justify-between">
+                      
+                      <div className="absolute bottom-6 left-6 right-6 p-4 bg-white/5 backdrop-blur-3xl border border-white/10 rounded-2xl flex items-center justify-between shadow-2xl">
                          <div className="flex items-center gap-3">
                             <div className="w-10 h-10 bg-primary/20 rounded-xl flex items-center justify-center text-primary">
                                <Navigation size={18} />
@@ -382,7 +406,7 @@ const CheckoutPage = () => {
                      ].map((method) => (
                         <div 
                            key={method.id}
-                           onClick={() => setFormData({...formData, paymentProvider: method.id as any})}
+                           onClick={() => setFormData({...formData, paymentProvider: method.id})}
                            className={cn(
                              "p-6 rounded-3xl border-2 transition-all cursor-pointer flex items-center gap-4",
                              formData.paymentProvider === method.id ? "border-primary bg-primary/5 shadow-lg shadow-primary/5" : "border-border hover:border-muted-foreground/30"
