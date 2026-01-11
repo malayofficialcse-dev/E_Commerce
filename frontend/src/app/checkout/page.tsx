@@ -166,7 +166,7 @@ const CheckoutPage = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
       
-      <main className="container mx-auto px-6 pt-32 pb-24 max-w-7xl">
+      <main className="container mx-auto px-6 pt-48 pb-24 max-w-7xl">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
           
           {/* Left: Steps & Forms */}
@@ -293,17 +293,28 @@ const CheckoutPage = () => {
                      </div>
                   </div>
 
-                  {/* Mock Map Panel */}
-                  <div className="relative h-64 bg-muted rounded-3xl overflow-hidden border border-border group">
-                      {/* Placeholder for map visual */}
-                      <div className="absolute inset-0 bg-[#000] opacity-10 dark:opacity-20" style={{ backgroundImage: 'radial-gradient(#ffffff 1px, transparent 1px)', backgroundSize: '20px 20px' }} />
+                  {/* Map Panel */}
+                  <div className="relative h-64 bg-[#050505] rounded-3xl overflow-hidden border border-border group transition-all duration-700">
+                      <Image 
+                        src="https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?q=80&w=1000" 
+                        alt="Location Map" 
+                        fill 
+                        className="object-cover opacity-20 grayscale group-hover:scale-110 transition-transform duration-1000"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
+                      
                       <div className="absolute inset-0 flex items-center justify-center">
                          <div className="relative">
-                            <div className="w-12 h-12 bg-primary rounded-full animate-ping opacity-20" />
-                            <MapPin className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-primary" size={32} />
+                            <motion.div 
+                              animate={{ scale: [1, 2, 1], opacity: [0.3, 0.1, 0.3] }}
+                              transition={{ duration: 2, repeat: Infinity }}
+                              className="w-16 h-16 bg-primary rounded-full" 
+                            />
+                            <MapPin className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-primary shadow-[0_0_20px_var(--primary)]" size={32} />
                          </div>
                       </div>
-                      <div className="absolute bottom-6 left-6 right-6 p-4 bg-white/10 dark:bg-black/40 backdrop-blur-xl border border-white/20 rounded-2xl flex items-center justify-between">
+                      
+                      <div className="absolute bottom-6 left-6 right-6 p-4 bg-white/5 backdrop-blur-3xl border border-white/10 rounded-2xl flex items-center justify-between shadow-2xl">
                          <div className="flex items-center gap-3">
                             <div className="w-10 h-10 bg-primary/20 rounded-xl flex items-center justify-center text-primary">
                                <Navigation size={18} />

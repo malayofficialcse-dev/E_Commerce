@@ -17,7 +17,12 @@ import connectDB from "./config/db";
 dotenv.config();
 
 // Connect to Database
-connectDB();
+console.log("Attempting to connect to MongoDB...");
+connectDB().then(() => {
+  console.log("Database connection process completed.");
+}).catch(err => {
+  console.error("Database connection failed:", err);
+});
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -43,4 +48,5 @@ app.get("/", (req, res) => {
 // Start Server
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
+  console.log(`API URL: http://localhost:${PORT}/api`);
 });
